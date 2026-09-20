@@ -1,4 +1,3 @@
-index.html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,16 +9,102 @@ index.html
 </head>
 <body>
 
-  <div class="cherubi-layout">
+  <div class="cherubi-page active" id="page-create">
+    <form class="cherubi-form" id="form-create">
+      <h2>Crear cuenta</h2>
+      <input type="text" id="create-username" placeholder="Usuario" required />
+      <input type="password" id="create-password" placeholder="Contraseña" required />
+      <button type="submit">Crear</button>
+    </form>
+  </div>
 
-    <div class="cherubi-sidebar">
-      <!-- Acá van los íconos de las apps más adelante -->
+  <div class="cherubi-page" id="page-login">
+    <form class="cherubi-form" id="form-login">
+      <h2>Iniciar sesión</h2>
+      <input type="text" id="login-username" placeholder="Usuario" required />
+      <input type="password" id="login-password" placeholder="Contraseña" required />
+      <button type="submit">Entrar</button>
+      <p class="cherubi-error" id="login-error"></p>
+    </form>
+  </div>
+
+  <div class="cherubi-page" id="page-warning">
+    <div class="cherubi-message">
+      <p>Tu cuenta solo se guardará en este navegador. Si accedés desde otro, no la va a recordar y vas a tener que crear un perfil nuevo.</p>
+      <button id="btn-warning-continue">Entendido</button>
     </div>
+  </div>
 
-    <div class="cherubi-main">
-      <p class="cherubi-placeholder">Próximamente: apps y juegos</p>
+  <div class="cherubi-page" id="page-survey">
+    <div class="cherubi-survey">
+      <p class="cherubi-survey-intro">Encuesta para seleccionar tu perfil. Esto solo elige la foto de perfil y la temática de la consola. Podés modificarlo más tarde en Configuración.</p>
+
+      <div class="cherubi-question">
+        <p>1. ¿Qué tipo de ambiente preferís para tu consola?</p>
+        <label><input type="radio" name="q1" value="A" /> Suave, luminoso y delicado.</label>
+        <label><input type="radio" name="q1" value="B" /> Alegre, musical y con bastante movimiento.</label>
+        <label><input type="radio" name="q1" value="C" /> Algo intermedio: tranquilo, pero con detalles que llamen la atención.</label>
+      </div>
+
+      <div class="cherubi-question">
+        <p>2. ¿Qué te gustaría que destacara más en tu perfil?</p>
+        <label><input type="radio" name="q2" value="A" /> La estética, los detalles y la sensación de calma.</label>
+        <label><input type="radio" name="q2" value="B" /> Los sonidos, las animaciones y los elementos interactivos.</label>
+        <label><input type="radio" name="q2" value="C" /> Una combinación equilibrada de ambos.</label>
+      </div>
+
+      <button id="btn-survey-submit">Continuar</button>
     </div>
+  </div>
 
+  <div class="cherubi-page" id="page-choose">
+    <div class="cherubi-message">
+      <p>Genial, podés elegir tu perfil.</p>
+      <div class="cherubi-profile-options">
+        <div class="cherubi-profile-option" data-profile="pluma">
+          <img src="https://i.ibb.co/xSYMwmP7/imagen-removebg-preview-162.png" alt="Pluma Angelical" />
+          <span>Pluma Angelical</span>
+        </div>
+        <div class="cherubi-profile-option" data-profile="nota">
+          <img src="https://i.ibb.co/67T8MYFM/6-removebg-preview.png" alt="Nota Musical" />
+          <span>Nota Musical</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cherubi-page" id="page-result">
+    <div class="cherubi-message">
+      <p id="result-text"></p>
+      <img id="result-img" src="" alt="" class="cherubi-result-img" />
+      <button id="btn-result-continue">Continuar</button>
+    </div>
+  </div>
+
+  <div class="cherubi-page" id="page-home">
+    <div class="cherubi-layout">
+
+      <div class="cherubi-sidebar">
+        <div class="cherubi-app cherubi-app-profile" id="app-perfil" title="Perfil">
+          <img id="sidebar-profile-pic" src="" alt="Perfil" />
+        </div>
+        <div class="cherubi-app" id="app-logros" title="Logros">🏆</div>
+        <div class="cherubi-app cherubi-app-star" id="app-estrellas" title="Visor de estrellas">✦</div>
+        <div class="cherubi-app" id="app-azar" title="Azar">🎲</div>
+        <div class="cherubi-app" id="app-notas" title="Notas">📝</div>
+        <div class="cherubi-app" id="app-tragamonedas" title="Tragamonedas">🎰</div>
+        <div class="cherubi-app" id="app-tienda" title="Tienda">🛒</div>
+      </div>
+
+      <div class="cherubi-main">
+        <p class="cherubi-placeholder">¡Bienvenido/a de nuevo!</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="cherubi-modal" id="cherubi-modal">
+    <div class="cherubi-modal-box" id="cherubi-modal-box"></div>
   </div>
 
   <script src="script.js"></script>
