@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DotGothic16', sans-serif;
+  background: #000;
+  color: #7a4a63;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.cherubi-layout {
+  display: flex;
+  height: 100%;
+}
+
+.cherubi-sidebar {
+  width: 70px;
+  background: rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.cherubi-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fdf6f9;
+  color: #7a4a63;
+}
+
+.cherubi-placeholder {
+  font-size: 13px;
+  text-align: center;
+}
