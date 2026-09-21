@@ -35,7 +35,7 @@
     </div>
   </div>
 
-   <div class="cherubi-page" id="page-survey-1">
+  <div class="cherubi-page" id="page-survey-1">
     <div class="cherubi-survey">
       <p class="cherubi-survey-intro">Encuesta para seleccionar tu perfil. Esto solo elige la foto de perfil y la temática de la consola. Podés modificarlo más tarde en Configuración.</p>
 
@@ -62,13 +62,13 @@
       <button id="btn-survey-submit">Continuar</button>
     </div>
   </div>
-  
+
   <div class="cherubi-page" id="page-choose">
     <div class="cherubi-message">
       <p>Genial, podés elegir tu perfil.</p>
       <div class="cherubi-profile-options">
         <div class="cherubi-profile-option" data-profile="pluma">
-          <img src="https://i.ibb.co/xSYMwmP7/imagen-removebg-preview-162.png" alt="Pluma Angelical" />
+          <img src="https://i.ibb.co/xkFjffC/3-removebg-preview.png" alt="Pluma Angelical" />
           <span>Pluma Angelical</span>
         </div>
         <div class="cherubi-profile-option" data-profile="nota">
@@ -91,19 +91,18 @@
     <div class="cherubi-layout">
 
       <div class="cherubi-sidebar">
-        <div class="cherubi-app cherubi-app-profile" id="app-perfil" title="Perfil">
-          <img id="sidebar-profile-pic" src="" alt="Perfil" />
-        </div>
-        <div class="cherubi-app" id="app-logros" title="Logros">🏆</div>
-        <div class="cherubi-app cherubi-app-star" id="app-estrellas" title="Visor de estrellas">✦</div>
-        <div class="cherubi-app" id="app-azar" title="Azar">🎲</div>
-        <div class="cherubi-app" id="app-notas" title="Notas">📝</div>
-        <div class="cherubi-app" id="app-tragamonedas" title="Tragamonedas">🎰</div>
-        <div class="cherubi-app" id="app-tienda" title="Tienda">🛒</div>
+        <div class="cherubi-sidebar-track" id="sidebar-track"></div>
       </div>
 
       <div class="cherubi-main">
-        <p class="cherubi-placeholder">¡Bienvenido/a de nuevo!</p>
+        <div class="cherubi-topbar">
+          <span id="topbar-pepitas">🪙 0</span>
+          <span id="topbar-time">00:00</span>
+          <span id="topbar-date">--/--/----</span>
+        </div>
+        <div class="cherubi-main-content">
+          <p class="cherubi-placeholder">¡Bienvenido/a de nuevo!</p>
+        </div>
       </div>
 
     </div>
