@@ -110,28 +110,39 @@ body {
   width: 100%;
 }
 
+/* ===== SIDEBAR CON SCROLL INFINITO ===== */
 .cherubi-sidebar {
-  width: 70px;
+  width: 90px;
   background: rgba(255,255,255,0.08);
   flex-shrink: 0;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+
+.cherubi-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.cherubi-sidebar-track {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0;
-  gap: 14px;
+  gap: 16px;
+  padding: 16px 0;
 }
 
 .cherubi-app {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
   background: rgba(255,255,255,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 24px;
   color: #fff;
+  flex-shrink: 0;
 }
 
 .cherubi-app-profile {
@@ -155,13 +166,30 @@ body {
   50% { opacity: 1; transform: scale(1.1); }
 }
 
+/* ===== ÁREA PRINCIPAL ===== */
 .cherubi-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fdf6f9;
+  color: #7a4a63;
+}
+
+.cherubi-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 11px;
+  background: rgba(0,0,0,0.05);
+  flex-shrink: 0;
+}
+
+.cherubi-main-content {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fdf6f9;
-  color: #7a4a63;
 }
 
 .cherubi-placeholder {
