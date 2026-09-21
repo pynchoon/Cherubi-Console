@@ -59,6 +59,15 @@ document.getElementById('btn-warning-continue').addEventListener('click', functi
   showPage('page-survey-1');
 });
 
+document.getElementById('btn-survey-next').addEventListener('click', function () {
+  const q1 = document.querySelector('input[name="q1"]:checked');
+  if (!q1) {
+    alert('Elegí una opción para continuar.');
+    return;
+  }
+  showPage('page-survey-2');
+});
+
 document.getElementById('btn-survey-submit').addEventListener('click', function () {
   const q1 = document.querySelector('input[name="q1"]:checked');
   const q2 = document.querySelector('input[name="q2"]:checked');
