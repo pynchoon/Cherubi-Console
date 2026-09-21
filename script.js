@@ -56,7 +56,7 @@ document.getElementById('form-create').addEventListener('submit', function (e) {
 });
 
 document.getElementById('btn-warning-continue').addEventListener('click', function () {
-  showPage('page-survey');
+  showPage('page-survey-1');
 });
 
 document.getElementById('btn-survey-submit').addEventListener('click', function () {
