@@ -1,0 +1,318 @@
+<!-- CHERUBI · ETAPA 1.1 · Pegar en un gadget "HTML/JavaScript" o en una Página (modo HTML) de Blogger -->
+<div id="cherubi-host"></div>
+<script>
+//<![CDATA[
+(function(){
+'use strict';
+/* ================= CONFIG (editá acá imágenes, nombres, costos) ================= */
+var CFG={key:'cherubi_save_v1',startCoins:50,profileCost:30,numMax:200,specials:[1,7,17,71,117],specialReward:17,
+ nightFrom:20,nightTo:6,height:'min(640px,92vh)',font:'https://fonts.googleapis.com/css2?family=DotGothic16&display=swap'};
+var PROFILES={
+ nota:{name:'Nota Musical',base:1,themes:['palido','oscuro','rosado'],img:{palido:'https://i.ibb.co/67T8MYFM/6-removebg-preview.png',oscuro:'https://i.ibb.co/LXyX8SJq/7-removebg-preview.png',rosado:'https://i.ibb.co/zTBtKxtM/8-removebg-preview.png'}},
+ pluma:{name:'Pluma Angelical',base:1,themes:['palido','oscuro','rosado'],img:{palido:'https://i.ibb.co/xkFjffC/3-removebg-preview.png',oscuro:'https://i.ibb.co/TBD4nsBC/Chat-GPT-Image-19-sept-2026-20-16-32.png',rosado:'https://i.ibb.co/SX9VLj3n/5-removebg-preview.png'}},
+ loto:{name:'Loto',base:0,themes:['loto'],img:{loto:'https://i.ibb.co/B2pfPNL6/imagen.png'}},
+ pastel:{name:'Pastel',base:0,themes:['pastel'],img:{pastel:'https://i.ibb.co/YF7NcnHf/imagen.png'}}
+};
+var TL={palido:'Pálido',oscuro:'Oscuro',rosado:'Rosado',loto:'Único',pastel:'Único'};
+var ITEMS={}; /* Etapas 2-4: id -> {name,img,...} */
+var CATS=['Generales','Visor de Estrellas','Generador de Números','Cocina','Ritmos','Jardín','Star Collector','Lucky Cherub','Tragamonedas','Secretos'];
+var ST={2:'Se activa en la Etapa 2',3:'Se activa en la Etapa 3',4:'Se activa en la Etapa 4',nv:'No verificable (juego externo)',def:'Pendiente de tu definición'};
+/* [categoría, nombre, condición, tipo p/n/s, recompensa, estado(1=activo ahora | etapa | 'nv' | 'def'), descripción] */
+var ACH=[
+[0,'First Boot','Encender Cherubi por primera vez.','p'],
+[0,'Home Sweet Home','Cambiar el tema de un perfil por primera vez.','p'],
+[0,'Little Collector','Conseguir 5 objetos diferentes.','p',0,2],
+[0,'Capitalista','Acumular 1000 pepitas de plata (saldo actual).','p'],
+[0,'Silver Fever','Acumular 500 pepitas de plata (saldo actual).','p'],
+[0,'Digital Resident','Utilizar Cherubi durante 7 días diferentes.','p'],
+[0,'A New Face','Desbloquear un perfil secreto.','p',0,'def'],
+[0,'Broke Angel','Quedarse con 0 pepitas de plata.','n'],
+[0,'Shopaholic','Comprar 5 objetos diferentes.','n',0,2],
+[0,'Identity Crisis','Cambiar el usuario y la contraseña de un perfil.','n'],
+[0,'Whoops!','Intentar comprar algo sin tener suficientes monedas.','n',0,2],
+[1,'Star Thief','Capturar la primera estrella.','p',0,2],
+[1,'Constellation','Capturar 10 estrellas.','p',0,2],
+[1,'Sky Hoarder','Tener 30 estrellas en el inventario.','p',0,2],
+[1,'Rare Sight','Capturar una estrella de máxima rareza.','p',0,2],
+[1,'Nocturnal','Abrir el visor durante la noche (20:00 a 06:00).','p',0,2],
+[1,'Secuestra estrellas','Vender las primeras estrellas obtenidas.','p',0,2,'Has traficado estrellas ilegalmente.'],
+[2,'Lucky Number','Obtener el primer número especial.','p'],
+[2,'Coleccionista numérico','Conseguir los números 1, 7, 17, 71 y 117.','p',117],
+[2,'3-6-9','Obtener la secuencia consecutiva 3, 6 y 9, en ese orden.','p',33],
+[2,'Repetition','Obtener el mismo número tres veces seguidas.','p'],
+[2,'Numerical Obsession','Generar 100 números.','p'],
+[2,'Oddly Specific','Obtener el número 117 tres veces.','p'],
+[3,'Little Chef','Jugar por primera vez (abrir un juego de cocina).','p',0,3],
+[3,'Perfect Recipe','Completar un nivel con puntuación perfecta.','p',0,'nv'],
+[3,'Kitchen Disaster','Fallar un pedido.','p',0,'nv'],
+[3,'Master Chef','Completar 10 niveles.','p',0,'nv'],
+[4,'First Note','Completar la primera canción.','p',0,4],
+[4,'Perfect Harmony','Completar una canción sin errores.','p',0,4],
+[4,'Encore!','Jugar 5 canciones.','p',0,4],
+[4,'Rhythm Addict','Conseguir un combo de 50 notas.','p',0,4],
+[5,'Green Thumb','Plantar la primera semilla.','p',0,4],
+[5,'First Bloom','Cultivar la primera flor.','p',0,4],
+[5,'Botanical','Conseguir 5 especies diferentes.','p',0,4],
+[5,'Neglectful Angel','Dejar que una planta se marchite.','n',0,4],
+[5,'Garden Paradise','Tener 10 plantas creciendo simultáneamente.','p',0,4],
+[6,'Catch Me!','Atrapar la primera estrella.','p',0,3],
+[6,'Shooting Star','Capturar 20 estrellas en una partida.','p',0,3],
+[6,'Untouchable','Terminar una partida sin perder vidas.','p',0,3],
+[6,'Sky Champion','Superar un récord determinado.','p',0,3],
+[7,'First Prize','Obtener el primer premio.','p',0,3],
+[7,'Jackpot!','Conseguir un premio de máxima rareza.','p',0,3],
+[7,'Almost...','Fallar una captura por muy poco.','p',0,3],
+[7,"Collector's Edition",'Conseguir 10 premios diferentes.','p',0,3],
+[8,"Beginner's Luck",'Ganar en la primera partida.','p',0,2],
+[8,'Bad Luck','Perder 5 partidas consecutivas.','n',0,2],
+[8,'House Always Wins','Perder 100 pepitas de plata acumuladas en la tragamonedas.','n',0,2],
+[8,'Unbelievable','Conseguir el premio máximo de la tragamonedas.','p',0,2],
+[9,'Are You Still There?','Mantener Cherubi abierto durante una hora.','s'],
+[9,'Déjà Vu','Abrir y cerrar la misma aplicación 10 veces.','s'],
+[9,'404 Angel','Intentar acceder a una aplicación bloqueada.','s',0,2],
+[9,'The Forgotten One','No abrir Cherubi durante 30 días.','s'],
+[9,'Behind the Screen','Encontrar una interacción secreta de la interfaz.','s',0,'def'],
+[9,'03:33','Abrir Cherubi exactamente a las 03:33.','s'],
+[9,'Little Ghost','Encontrar un evento paranormal dentro de la consola.','s',0,'def']
+];
+var AM={},ach=ACH.map(function(a){var o={c:a[0],n:a[1],d:a[2],t:a[3],r:a[4]||0,st:a[5]||1,f:a[6]||''};AM[o.n]=o;return o;});
+var APPS=[ /* [id, icono, título, etapa, render, descripción futura] */
+['perfiles','♡','Perfiles',1,appPerfiles],['logros','🏆','Logros',1,appLogros],['inventario','🎒','Inventario',1,appInv],
+['numeros','🔢','Generador de Números',1,appNum],['notas','📝','Notas',1,appNotes],
+['estrellas','★','Visor de Estrellas',2,null,'Cielo nocturno interactivo para capturar y vender estrellas.'],
+['tragamonedas','🎰','Tragamonedas',2,null,'Máquina con apuestas, historial y premios.'],
+['tienda','🛒','Tienda',2,null,'Juegos, objetos y coleccionables a cambio de pepitas.'],
+['cocina','🍳','Cocina',3,null,'Devilish Cooking y Papa\'s Sushiria (iframe o pestaña nueva).'],
+['starcollector','🧺','Star Collector',3,null,'Atrapá estrellas que caen y evitá los obstáculos.'],
+['lucky','🧸','Lucky Cherub',3,null,'Máquina de premios con garra.'],
+['ritmo','🎵','Ritmos',4,null,'Juego de ritmo original con música.'],
+['jardin','🌸','Jardín',4,null,'Cultivá flores y colecciónalas.']
+];
+/* ================= CORE ================= */
+var S,R,cur=null,TI,T1,H={},Q=[];
+function def(){return{v:1,coins:0,claimed:{},ach:{},inv:{},bought:[],days:[],last:0,opens:0,prof:{},unlocked:{loto:0,pastel:0},active:null,notes:[],notesSel:null,num:{n:0,seen:{},hist:[],c117:0},app:{}};}
+function load(){try{var r=JSON.parse(localStorage.getItem(CFG.key));if(r&&r.v){var d=def();for(var k in r)d[k]=r[k];return d;}}catch(e){}return null;}
+function save(){try{localStorage.setItem(CFG.key,JSON.stringify(S));}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function $(s){return R.querySelector(s);}
+function on(e,f){(H[e]=H[e]||[]).push(f);}
+function emit(e,d){(H[e]||[]).forEach(function(f){f(d);});}
+function rr(v,a){return(v>>>a)|(v<<(32-a));}
+function sha256(s){var mp=Math.pow,mw=mp(2,32),i,j,r='',w=[],bl=s.length*8,h=[],k=[],pc=0,ic={};
+ for(var c=2;pc<64;c++){if(!ic[c]){for(i=0;i<313;i+=c)ic[i]=c;h[pc]=(mp(c,.5)*mw)|0;k[pc++]=(mp(c,1/3)*mw)|0;}}
+ s+='\x80';while(s.length%64-56)s+='\x00';
+ for(i=0;i<s.length;i++){j=s.charCodeAt(i);w[i>>2]|=j<<((3-i)%4)*8;}
+ w[w.length]=(bl/mw)|0;w[w.length]=bl;
+ for(j=0;j<w.length;){var x=w.slice(j,j+=16),o=h;h=h.slice(0,8);
+  for(i=0;i<64;i++){var w15=x[i-15],w2=x[i-2],a=h[0],e=h[4],
+   t1=h[7]+(rr(e,6)^rr(e,11)^rr(e,25))+((e&h[5])^((~e)&h[6]))+k[i]+(x[i]=(i<16)?x[i]:(x[i-16]+(rr(w15,7)^rr(w15,18)^(w15>>>3))+x[i-7]+(rr(w2,17)^rr(w2,19)^(w2>>>10))|0)),
+   t2=(rr(a,2)^rr(a,13)^rr(a,22))+((a&h[1])^(a&h[2])^(h[1]&h[2]));
+   h=[(t1+t2)|0].concat(h);h[4]=(h[4]+t1)|0;}
+  for(i=0;i<8;i++)h[i]=(h[i]+o[i])|0;}
+ for(i=0;i<8;i++)for(j=3;j+1;j--){var q=(h[i]>>(j*8))&255;r+=((q<16)?0:'')+q.toString(16);}
+ return r;}
+async function hash(s){return sha256(unescape(encodeURIComponent('cherubi:'+s)));}
+function legacy(s){var h=5381,i;s='cherubi:'+s;for(i=0;i<s.length;i++)h=((h*33)^s.charCodeAt(i))>>>0;return 'f'+h.toString(16);}
+function toast(m){var t=$('.toasts');if(!t){Q.push(m);return;}var d=document.createElement('div');d.className='ts';d.textContent=m;t.appendChild(d);setTimeout(function(){d.remove();},3800);}
+function unlock(n){var a=AM[n];if(!a||S.ach[n])return;S.ach[n]=Date.now();save();toast('🏆 '+(a.t==='s'?'Logro secreto: ':'Logro: ')+a.n+(a.r?' (+'+a.r+' pepitas)':''));if(a.r)claim('ach:'+n,a.r);emit('ach',n);if(cur==='logros')render('logros');}
+function claim(k,n){if(S.claimed[k])return false;S.claimed[k]=1;S.coins+=n;save();after();return true;}
+function add(n){S.coins+=n;save();after();}
+function spend(n,o){if(S.coins<n){if(o&&o.purchase)unlock('Whoops!');return false;}S.coins-=n;save();after();return true;}
+function addItem(id,q){S.inv[id]=(S.inv[id]||0)+(q||1);save();checkAch();if(cur==='inventario')render('inventario');}
+function after(){updateBar();checkAch();}
+function checkAch(){
+ if(!S.active)return;
+ if(S.coins>=500)unlock('Silver Fever');if(S.coins>=1000)unlock('Capitalista');
+ if(S.coins===0&&S.claimed.init)unlock('Broke Angel');
+ if(Object.keys(S.inv).length>=5)unlock('Little Collector');
+ if(S.days.length>=7)unlock('Digital Resident');
+ if(S.bought.length>=5)unlock('Shopaholic');
+ for(var k in S.prof){if(S.prof[k].cu>0&&S.prof[k].cp>0)unlock('Identity Crisis');}
+}
+function unlockProfile(id){if(PROFILES[id]&&!PROFILES[id].base&&!S.unlocked[id]){S.unlocked[id]=1;save();unlock('A New Face');if(cur==='perfiles')render('perfiles');}}
+/* ================= UI BASE ================= */
+function view(h){$('.cb').innerHTML=h;}
+function modal(h){closeM();var m=document.createElement('div');m.className='mod';m.innerHTML='<div class="card w">'+h+'</div>';m.addEventListener('click',function(e){if(e.target===m||e.target.getAttribute('data-x')!==null)closeM();});$('.cb').appendChild(m);return m;}
+function closeM(){var m=$('.mod');if(m)m.remove();}
+function ask(msg){return new Promise(function(r){var m=modal('<p>'+msg+'</p><div class="row"><button class="bt" data-y>Confirmar</button><button class="bt g" data-x>Cancelar</button></div>');m.querySelector('[data-y]').onclick=function(){closeM();r(true);};m.addEventListener('click',function(e){if(e.target===m||e.target.getAttribute('data-x')!==null)r(false);});});}
+function pimg(id){var d=S.prof[id];return PROFILES[id].img[d?d.theme:PROFILES[id].themes[0]];}
+function theme(){var p=S.prof[S.active];$('.cb').setAttribute('data-theme',p?p.theme:'palido');}
+function picks(ids,sub){return '<div class="row">'+ids.map(function(id,i){return '<label class="pick"><input type="radio" name="p" value="'+id+'"'+(i?'':' checked')+'><img src="'+PROFILES[id].img[PROFILES[id].themes[0]]+'" alt=""><span>'+esc(PROFILES[id].name)+'</span>'+(sub?'<small>'+esc(S.prof[id].user)+'</small>':'')+'</label>';}).join('')+'</div>';}
+async function mk(id,u,p){S.prof[id]={user:u,hash:await hash(p),theme:PROFILES[id].themes[0],cu:0,cp:0};save();}
+function renderCreate(){
+ view('<div class="center"><form class="card w" id="f"><h2>CHERUBI</h2><p>Creá tu primer perfil</p>'+picks(['nota','pluma'])+'<input id="u" placeholder="Usuario" required maxlength="20"><input id="pw" type="password" placeholder="Contraseña" required><p class="msg">Tu progreso se guarda solo en este navegador.</p><button class="bt">Crear y entrar</button></form></div>');
+ $('#f').onsubmit=async function(e){e.preventDefault();var id=$('input[name=p]:checked').value,u=$('#u').value.trim();if(!u)return;await mk(id,u,$('#pw').value);S.active=id;claim('init',CFG.startCoins);unlock('First Boot');enter();};
+}
+function renderLogin(){
+ view('<div class="center"><form class="card w" id="f"><h2>Iniciar sesión</h2>'+picks(Object.keys(S.prof),1)+'<input id="pw" type="password" placeholder="Contraseña" required><p class="err" id="er"></p><button class="bt">Entrar</button><p class="msg">Una contraseña olvidada no se puede recuperar.</p><button type="button" class="bt g sm" id="rs">Restablecer consola (borra todos los datos)</button></form></div>');
+ $('#f').onsubmit=async function(e){e.preventDefault();var id=$('input[name=p]:checked').value,pw=$('#pw').value,hv=await hash(pw),st=S.prof[id].hash;
+  if(hv===st||(st.length<64&&legacy(pw)===st)){if(hv!==st){S.prof[id].hash=hv;save();}S.active=id;enter();}else $('#er').textContent='Usuario o contraseña incorrectos.';};
+ $('#rs').onclick=resetFlow;
+}
+function enter(){
+ var now=new Date(),prev=S.last;S.last=Date.now();S.opens++;
+ var day=now.toLocaleDateString('sv');if(S.days.indexOf(day)<0)S.days.push(day);save();
+ goHome();
+ if(prev&&Date.now()-prev>=30*864e5){unlock('The Forgotten One');modal('<h3>Bienvenido/a de vuelta</h3><p>Pasó mucho tiempo desde tu última visita. Cherubi te estuvo esperando.</p><button class="bt" data-x>Entrar</button>');}
+ if(now.getHours()===3&&now.getMinutes()===33)unlock('03:33');
+ clearTimeout(T1);T1=setTimeout(function(){unlock('Are You Still There?');},36e5);
+ checkAch();
+}
+function goHome(){
+ view('<div class="lay"><div class="side">'+APPS.map(function(a){var p=a[3]>1&&!a[4];return '<div class="ic'+(p?' pend':'')+'" data-a="'+a[0]+'" title="'+esc(a[2])+'"'+(p?' data-st="E'+a[3]+'"':'')+'>'+(a[0]==='perfiles'?'<img id="sp" src="'+pimg(S.active)+'" alt="">':a[1])+'</div>';}).join('')+'</div><div class="main"><div class="bar"><span id="coins" class="chip"></span><span id="date"></span><span id="time"></span><span class="chip"><img id="bp" src="" alt=""><span id="bnm"></span></span><button class="bt g sm" id="lo">Salir</button></div><div class="area" id="ar"></div></div></div><div class="toasts"></div>');
+ theme();updateBar();cur=null;
+ $('.side').onclick=function(e){var el=e.target.closest('.ic');if(el)openApp(el.getAttribute('data-a'));};
+ $('#lo').onclick=function(){clearInterval(TI);clearTimeout(T1);cur=null;renderLogin();};
+ $('#ar').innerHTML='<div class="card"><h3>¡Bienvenido/a!</h3><p>Elegí una aplicación en la barra lateral.</p></div>';
+ clearInterval(TI);TI=setInterval(updateBar,1000);
+ while(Q.length)toast(Q.shift());
+}
+function updateBar(){
+ var c=$('#coins');if(!c)return;c.textContent='✦ '+S.coins+' pepitas';c.className='chip'+(S.coins===0&&S.claimed.init?' sad':'');
+ var d=new Date();$('#time').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('#date').textContent=d.toLocaleDateString();
+ $('#bp').src=pimg(S.active);$('#bnm').textContent=PROFILES[S.active].name+' · '+S.prof[S.active].user;
+ var sp=$('#sp');if(sp)sp.src=pimg(S.active);
+}
+function openApp(id){
+ if(cur&&cur!==id){S.app[cur]=(S.app[cur]||0)+1;save();if(S.app[cur]>=10)unlock('Déjà Vu');}
+ cur=id;R.querySelectorAll('.ic').forEach(function(e){e.classList.toggle('on',e.getAttribute('data-a')===id);});render(id);
+}
+function render(id){
+ var A=APPS.filter(function(a){return a[0]===id;})[0],b=$('#ar');if(!A||!b)return;b.onclick=null;
+ if(!A[4]){b.innerHTML='<div class="card"><h3>'+esc(A[2])+'</h3><p><b>Etapa '+A[3]+': todavía no desarrollada.</b></p><p>'+esc(A[5]||'')+'</p></div>';return;}
+ A[4](b);
+}
+/* ================= RESPALDO Y RESTABLECIMIENTO ================= */
+function exportData(){
+ var j=JSON.stringify({app:'cherubi',version:'1.1',exported:new Date().toISOString(),key:CFG.key,data:S},null,1);
+ try{var a=document.createElement('a'),u=URL.createObjectURL(new Blob([j],{type:'application/json'}));a.href=u;a.download='cherubi-respaldo-'+new Date().toLocaleDateString('sv')+'.json';$('.cb').appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u);},2000);toast('Respaldo exportado');}
+ catch(e){modal('<h3>Respaldo</h3><p>No se pudo descargar. Copiá este texto y guardalo:</p><textarea readonly>'+esc(j)+'</textarea><button class="bt" data-x>Cerrar</button>');}
+}
+function resetFlow(){
+ var m=modal('<h3>⚠ Restablecer consola</h3><p><b>Esto NO recupera tu acceso.</b> Borra TODOS los datos de Cherubi en este navegador: perfiles, contraseñas, pepitas, inventario, logros, notas y progreso. No se puede deshacer.</p><p class="msg">Si querés conservar una copia, exportá un respaldo antes.</p><div class="row"><button class="bt g" id="rx">Exportar respaldo</button><button class="bt" id="rc">Continuar</button><button class="bt g" data-x>Cancelar</button></div>');
+ m.querySelector('#rx').onclick=exportData;
+ m.querySelector('#rc').onclick=function(){
+  var m2=modal('<h3>Confirmación final</h3><p>Para borrar todo escribí <b>RESTABLECER</b>:</p><input id="rt" autocomplete="off"><p class="err" id="re"></p><div class="row"><button class="bt" id="rf">Borrar todo</button><button class="bt g" data-x>Cancelar</button></div>');
+  m2.querySelector('#rf').onclick=function(){if(m2.querySelector('#rt').value.trim()!=='RESTABLECER'){m2.querySelector('#re').textContent='Escribí la palabra exacta para continuar.';return;}doReset();};
+ };
+}
+function doReset(){try{localStorage.removeItem(CFG.key);}catch(e){}clearInterval(TI);clearTimeout(T1);S=def();cur=null;closeM();renderCreate();}
+/* ================= APPS ================= */
+function appPerfiles(b){
+ var a=S.active,h='<h3>Perfiles</h3><div class="grid">';
+ for(var id in PROFILES){var P=PROFILES[id],d=S.prof[id];
+  if(!P.base&&!S.unlocked[id]){h+='<div class="card lk"><div class="si">?</div><b>???</b><small>Perfil secreto bloqueado</small></div>';continue;}
+  h+='<div class="card'+(a===id?' on':'')+'"><img class="pi" src="'+pimg(id)+'" alt=""><b>'+esc(P.name)+'</b>'+(d?(a===id?'<small>Perfil activo</small>':'<button class="bt sm" data-sw="'+id+'">Usar</button>'):'<button class="bt sm" data-mk="'+id+'">Crear perfil</button>')+'</div>';}
+ var p=S.prof[a],P2=PROFILES[a];
+ h+='</div><h4>Perfil activo: '+esc(P2.name)+'</h4><div class="card"><p>Usuario: <b>'+esc(p.user)+'</b></p><div class="row"><button class="bt sm" data-ed="user">Cambiar usuario ('+CFG.profileCost+')</button><button class="bt sm" data-ed="pass">Cambiar contraseña ('+CFG.profileCost+')</button></div>';
+ if(P2.themes.length>1)h+='<p>Tema:</p><div class="row">'+P2.themes.map(function(t){return '<button class="bt sm'+(p.theme===t?'':' g')+'" data-th="'+t+'">'+TL[t]+'</button>';}).join('')+'</div>';
+ h+='</div><button class="bt g" id="ts">¿Qué perfil me corresponde?</button><h4>Respaldo y restablecimiento</h4><div class="card"><p>Exportá una copia de tus datos o restablecé la consola (borra todo).</p><div class="row"><button class="bt sm" id="ex">Exportar respaldo</button><button class="bt g sm" id="rs2">Restablecer consola…</button></div></div>';
+ b.innerHTML=h;
+ b.onclick=function(e){var t=e.target,v;
+  if((v=t.getAttribute('data-sw'))){S.active=v;save();theme();updateBar();render('perfiles');}
+  else if((v=t.getAttribute('data-mk')))newProfile(v);
+  else if((v=t.getAttribute('data-ed')))editCred(v);
+  else if((v=t.getAttribute('data-th'))){if(S.prof[a].theme!==v){S.prof[a].theme=v;save();unlock('Home Sweet Home');theme();updateBar();render('perfiles');}}
+  else if(t.id==='ts')testPerfil();else if(t.id==='ex')exportData();else if(t.id==='rs2')resetFlow();};
+}
+function newProfile(id){
+ var m=modal('<h3>Crear '+esc(PROFILES[id].name)+'</h3><form id="nf"><input id="nu" placeholder="Usuario" required maxlength="20"><input id="np" type="password" placeholder="Contraseña" required><p class="msg">Crear un perfil es gratis.</p><div class="row"><button class="bt">Crear</button><button type="button" class="bt g" data-x>Cancelar</button></div></form>');
+ m.querySelector('#nf').onsubmit=async function(e){e.preventDefault();var u=m.querySelector('#nu').value.trim();if(!u)return;await mk(id,u,m.querySelector('#np').value);closeM();render('perfiles');toast('Perfil creado');};
+}
+function editCred(kind){
+ var m=modal('<h3>Cambiar '+(kind==='user'?'usuario':'contraseña')+'</h3><form id="ef"><input id="nv"'+(kind==='user'?'':' type="password"')+' required maxlength="30" placeholder="Nuevo valor"><p class="msg">Costo: '+CFG.profileCost+' pepitas de plata.</p><p class="err" id="ee"></p><div class="row"><button class="bt">Continuar</button><button type="button" class="bt g" data-x>Cancelar</button></div></form>');
+ m.querySelector('#ef').onsubmit=async function(e){e.preventDefault();var v=m.querySelector('#nv').value;if(kind==='user')v=v.trim();if(!v)return;
+  if(S.coins<CFG.profileCost){m.querySelector('#ee').textContent='No tenés suficientes pepitas de plata.';return;}
+  closeM();if(!(await ask('Cambiar '+(kind==='user'?'el usuario':'la contraseña')+' costará '+CFG.profileCost+' pepitas de plata. ¿Confirmás?')))return;
+  if(!spend(CFG.profileCost))return;var p=S.prof[S.active];
+  if(kind==='user'){p.user=v;p.cu++;}else{p.hash=await hash(v);p.cp++;}
+  save();checkAch();updateBar();render('perfiles');toast('Datos actualizados');};
+}
+function testPerfil(){
+ function q(n,t,o){return '<p>'+t+'</p>'+o.map(function(x,i){return '<label class="op"><input type="radio" name="q'+n+'" value="'+'ABC'[i]+'"> '+x+'</label>';}).join('');}
+ var m=modal('<h3>¿Qué perfil me corresponde?</h3><form id="tf">'+q(1,'1. ¿Qué tipo de ambiente preferís para tu consola?',['Suave, luminoso y delicado.','Alegre, musical y con bastante movimiento.','Algo intermedio: tranquilo, pero con detalles que llamen la atención.'])+q(2,'2. ¿Qué te gustaría que destacara más en tu perfil?',['La estética, los detalles y la sensación de calma.','Los sonidos, las animaciones y los elementos interactivos.','Una combinación equilibrada de ambos.'])+'<p class="msg">Es solo una sugerencia: no cambia tu perfil.</p><p id="tr"></p><div class="row"><button class="bt">Ver resultado</button><button type="button" class="bt g" data-x>Cerrar</button></div></form>');
+ m.querySelector('#tf').onsubmit=function(e){e.preventDefault();var a=m.querySelector('input[name=q1]:checked'),c=m.querySelector('input[name=q2]:checked'),t=m.querySelector('#tr');
+  if(!a||!c){t.textContent='Respondé las dos preguntas.';return;}
+  var k=a.value+c.value,id=k==='AA'?'pluma':k==='BB'?'nota':null;
+  t.innerHTML=id?'Te corresponde <b>'+PROFILES[id].name+'</b>.<br><img class="pi" src="'+PROFILES[id].img.palido+'" alt="">':'Resultado mixto: ambos perfiles te quedan bien, elegí el que prefieras.';};
+}
+function appLogros(b){
+ var n=ach.filter(function(a){return S.ach[a.n];}).length,TT={p:'Positivo',n:'Negativo',s:'Secreto'};
+ var h='<h3>Emblemas y logros</h3><p>'+n+' / '+ach.length+' desbloqueados</p>';
+ CATS.forEach(function(c,i){h+='<h4>'+c+'</h4><div class="grid">'+ach.filter(function(a){return a.c===i;}).map(function(a){
+  var u=S.ach[a.n];
+  if(a.t==='s'&&!u)return '<div class="card lk"><div class="si">?</div><b>???</b><small>Logro secreto</small></div>';
+  return '<div class="card bd'+(u?' got':'')+'"><b>'+esc(a.n)+'</b><small>'+TT[a.t]+' · '+esc(c)+'</small><p>'+esc(a.f||a.d)+'</p>'+(a.f?'<small>Condición: '+esc(a.d)+'</small>':'')+(a.r?'<small>Recompensa: '+a.r+' pepitas</small>':'')+'<small>'+(u?'✔ Desbloqueado '+new Date(u).toLocaleDateString():'🔒 Bloqueado'+(a.st!==1?' · '+ST[a.st]:''))+'</small></div>';}).join('')+'</div>';});
+ b.innerHTML=h;
+}
+function appInv(b){
+ var k=Object.keys(S.inv),h='<h3>Inventario</h3>';
+ h+=k.length?'<div class="grid">'+k.map(function(id){var it=ITEMS[id]||{};return '<div class="card">'+(it.img?'<img class="pi" src="'+esc(it.img)+'" alt="">':'')+'<b>'+esc(it.name||id)+'</b><small>x'+S.inv[id]+'</small></div>';}).join('')+'</div>':'<div class="card"><p>Todavía no tenés objetos.</p><p>Se obtienen en la Tienda, el Visor de Estrellas, Lucky Cherub y los juegos (Etapas 2 a 4).</p></div>';
+ b.innerHTML=h;
+}
+function appNum(b){
+ var N=S.num,busy=false;
+ b.innerHTML='<h3>Generador de números</h3><div class="big" id="bn">'+(N.hist.length?N.hist[N.hist.length-1]:'--')+'</div><button class="bt" id="gb">Generar (1 a '+CFG.numMax+')</button><p>Generados: <span id="gc">'+N.n+'</span></p><h4>Números especiales</h4><div class="row" id="sp2"></div><h4>Últimos resultados</h4><div class="row" id="gh"></div>';
+ function paint(){if(!$('#gc'))return;$('#gc').textContent=N.n;$('#sp2').innerHTML=CFG.specials.map(function(x){return '<span class="chip'+(N.seen[x]?' on':'')+'">'+x+'</span>';}).join('');$('#gh').innerHTML=N.hist.slice().reverse().map(function(x){return '<span class="chip">'+x+'</span>';}).join('');}
+ paint();
+ function commit(x){
+  N.n++;N.hist.push(x);if(N.hist.length>20)N.hist.shift();if(x===117)N.c117++;
+  var l=N.hist.slice(-3),e=$('#bn');if(e)e.textContent=x;
+  save();paint();
+  if(CFG.specials.indexOf(x)>=0){N.seen[x]=1;if(claim('num:'+x,CFG.specialReward))toast('+'+CFG.specialReward+' pepitas');unlock('Lucky Number');if(CFG.specials.every(function(s){return N.seen[s];}))unlock('Coleccionista numérico');}
+  if(l.length===3&&l[0]===3&&l[1]===6&&l[2]===9)unlock('3-6-9');
+  if(l.length===3&&l[0]===l[1]&&l[1]===l[2])unlock('Repetition');
+  if(N.n>=100)unlock('Numerical Obsession');if(N.c117>=3)unlock('Oddly Specific');
+  save();paint();
+ }
+ $('#gb').onclick=function(){if(busy)return;busy=true;$('#gb').disabled=true;
+  var x=1+Math.floor(Math.random()*CFG.numMax),i=0,t=setInterval(function(){var e=$('#bn');
+   if(++i>8){clearInterval(t);busy=false;commit(x);var g=$('#gb');if(g)g.disabled=false;return;}
+   if(e)e.textContent=1+Math.floor(Math.random()*CFG.numMax);},60);};
+}
+function appNotes(b){
+ function cur2(){return S.notes.filter(function(n){return n.id===S.notesSel;})[0];}
+ function draw(){var c=cur2();
+  b.innerHTML='<h3>Notas</h3><div class="nt"><div class="nl"><button class="bt sm" id="nn">+ Nueva</button>'+S.notes.map(function(n){return '<div class="ni'+(n.id===S.notesSel?' on':'')+'" data-i="'+n.id+'">'+esc(n.t||'Sin título')+'</div>';}).join('')+'</div><div class="ne">'+(c?'<input id="nt" value="'+esc(c.t)+'" placeholder="Título" maxlength="60"><textarea id="nx" placeholder="Escribí aquí...">'+esc(c.x)+'</textarea><button class="bt g sm" id="nd">Eliminar</button><small>Se guarda automáticamente.</small>':'<p>Creá una nota para empezar.</p>')+'</div></div>';
+  var t=$('#nt'),x=$('#nx');
+  if(t){t.oninput=function(){c.t=t.value;save();var it=b.querySelector('.ni.on');if(it)it.textContent=c.t||'Sin título';};x.oninput=function(){c.x=x.value;save();};}}
+ draw();
+ b.onclick=function(e){var t=e.target,i=t.getAttribute('data-i');
+  if(t.id==='nn'){var id='n'+Date.now();S.notes.unshift({id:id,t:'',x:''});S.notesSel=id;save();draw();}
+  else if(i){S.notesSel=i;save();draw();}
+  else if(t.id==='nd'){ask('¿Eliminar esta nota?').then(function(ok){if(!ok)return;S.notes=S.notes.filter(function(n){return n.id!==S.notesSel;});S.notesSel=S.notes[0]?S.notes[0].id:null;save();draw();});}};
+}
+/* ================= ESTILOS ================= */
+var CSS='*{box-sizing:border-box;margin:0;padding:0}:host{display:block}'+
+'.cb{--bg:#F7FEFE;--pn:rgba(255,255,255,.72);--ink:#8D8194;--ac:#F7D9E9;--a2:#D8C9E8;--ln:#D9B8D0;--gd:#F4E8B9;--mn:#B8E9DC;font-family:"DotGothic16","Segoe UI",sans-serif;color:var(--ink);background:var(--bg);width:100%;max-width:980px;margin:0 auto;border:3px solid var(--ln);border-radius:22px;box-shadow:0 6px 0 var(--ln),0 14px 26px rgba(141,129,148,.25);overflow:hidden;position:relative;font-size:14px;line-height:1.4}'+
+'.cb[data-theme=rosado]{--bg:#FCEEF5;--pn:rgba(247,217,233,.5);--a2:#D9B8D0}.cb[data-theme=oscuro]{--bg:#3B3548;--pn:rgba(216,201,232,.14);--ink:#F7FEFE;--ac:#6B5A82;--a2:#4E4561;--ln:#8D8194}.cb[data-theme=loto]{--bg:#F4EEFA;--ac:#D8C9E8;--a2:#C5D8E9;--ln:#B7A5CF}.cb[data-theme=pastel]{--bg:#EEFAF6;--ac:#B8E9DC;--a2:#DCE9F6;--ln:#9FD3C4}'+
+'.lay{display:flex;height:100%;min-height:0}.side{width:86px;display:flex;flex-direction:column;gap:10px;padding:10px;overflow:auto;background:rgba(216,201,232,.22);border-right:2px solid var(--ln)}'+
+'.ic{width:58px;height:58px;flex:none;border-radius:16px;border:2px solid var(--ln);background:var(--pn);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;position:relative;overflow:visible}.ic img{width:100%;height:100%;object-fit:cover;border-radius:14px}.ic.on{background:var(--ac);box-shadow:0 0 0 3px var(--gd)}.ic.pend{opacity:.6}.ic.pend::after{content:attr(data-st);position:absolute;right:-3px;bottom:-3px;font-size:9px;background:var(--a2);color:var(--ink);border-radius:6px;padding:0 4px}'+
+'.main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--pn);border-bottom:2px solid var(--ln);font-size:12px}.bar img{width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px}.area{flex:1;overflow:auto;padding:14px;min-height:0}'+
+'h2,h3,h4{margin:6px 0}h4{margin-top:14px}p{margin:6px 0}small{display:block;opacity:.8;margin-top:3px}'+
+'.card{background:var(--pn);border:2px solid var(--ln);border-radius:14px;padding:12px;margin:6px 0;text-align:center}.card.w{width:92%;max-width:340px}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.grid .card{margin:0}.card.on,.bd.got{border-color:#d9b84f;box-shadow:0 0 0 2px var(--gd)}.bd{text-align:left}.lk{opacity:.65}.si{font-size:30px}'+
+'.pi{width:64px;height:64px;border-radius:50%;object-fit:cover;display:block;margin:4px auto}.ri{width:70px;height:70px}'+
+'.bt{border:2px solid var(--ln);border-radius:10px;background:var(--ac);color:var(--ink);padding:8px 14px;cursor:pointer;font-family:inherit;margin:4px 2px}.bt.g{background:transparent}.bt.sm{padding:4px 10px;font-size:12px}.bt:disabled{opacity:.5;cursor:default}'+
+'input[type=text],input:not([type]),input[type=password],textarea{display:block;width:100%;margin:6px 0;padding:8px;border:2px solid var(--ln);border-radius:8px;background:#fff;color:#8D8194;font-family:inherit}textarea{min-height:170px;resize:vertical}'+
+'.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;align-items:center}.center{height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,var(--ac),transparent 50%),radial-gradient(circle at 80% 80%,var(--a2),transparent 50%)}'+
+'.pick{cursor:pointer;text-align:center;font-size:12px}.pick input{display:none}.pick img{width:62px;height:62px;border-radius:50%;object-fit:cover;border:3px solid var(--ln);display:block;margin:0 auto 4px}.pick input:checked+img{border-color:#d9b84f;box-shadow:0 0 0 3px var(--gd)}'+
+'.op{display:block;text-align:left;margin:4px 0;font-size:12px}.op input{width:auto;display:inline;margin:0 4px 0 0}.err{color:#b23b3b;font-size:12px}.msg{font-size:11px;opacity:.8}'+
+'.chip{display:inline-block;padding:3px 10px;border:2px solid var(--ln);border-radius:20px;background:var(--pn)}.chip.on{background:var(--gd);color:#8D8194}.chip.sad{animation:sad 1.6s infinite}.chip.sad::after{content:" 💧"}@keyframes sad{50%{transform:translateY(3px);opacity:.6}}'+
+'.big{font-size:64px;text-align:center;margin:12px 0;color:var(--ink)}#gb{display:block;margin:0 auto}'+
+'.nt{display:flex;gap:10px;flex-wrap:wrap}.nl{width:170px;flex:none}.ne{flex:1;min-width:200px}.ni{padding:6px 8px;border:2px solid var(--ln);border-radius:8px;margin:4px 0;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.ni.on{background:var(--ac)}'+
+'.mod{position:absolute;inset:0;background:rgba(60,50,70,.45);display:flex;align-items:center;justify-content:center;z-index:20;overflow:auto;padding:10px}.mod .card{background:var(--bg)}'+
+'.toasts{position:absolute;top:50px;right:10px;z-index:30;display:flex;flex-direction:column;gap:6px}.ts{background:var(--gd);color:#8D8194;border:2px solid #d9b84f;border-radius:10px;padding:8px 12px;font-size:12px;animation:in .3s}@keyframes in{from{transform:translateX(30px);opacity:0}}'+
+'@media(max-width:620px){.lay{flex-direction:column-reverse}.side{width:100%;flex-direction:row;height:82px;flex:none;border-right:0;border-top:2px solid var(--ln)}.nl{width:100%}}';
+/* ================= BOOT ================= */
+var host=document.getElementById('cherubi-host');
+if(!host){host=document.createElement('div');document.body.appendChild(host);}
+var lk=document.createElement('link');lk.rel='stylesheet';lk.href=CFG.font;document.head.appendChild(lk);
+R=host.attachShadow({mode:'open'});R.innerHTML='<style>'+CSS+'</style><div class="cb"></div>';
+$('.cb').style.height=CFG.height;
+S=load()||def();
+window.Cherubi={get state(){return S;},unlock:unlock,claim:claim,add:add,spend:spend,addItem:addItem,on:on,emit:emit,unlockProfile:unlockProfile,
+ registerApp:function(a){var t=[a.id,a.icon,a.title,1,a.render,''],i=APPS.findIndex(function(x){return x[0]===a.id;});if(i<0)APPS.push(t);else APPS[i]=t;}};
+if(Object.keys(S.prof).length)renderLogin();else renderCreate();
+})();
+//]]>
+</script>
